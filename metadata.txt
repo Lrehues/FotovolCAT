@@ -12,8 +12,8 @@ email=fotovolcat@gmail.com
 
 about=This plugin automates the obtention, processing and visualization of spatial data of relevance for sitting solar power stations in Catalonia. External dependencies used: random, functools. Guide to install python libs: https://landscapearchaeology.org/2018/installing-python-packages-in-qgis-3-for-windows/
 
-tracker=http://bugs
-repository=http://repo
+tracker=https://github.com/Lrehues/FotovolCAT
+repository=https://github.com/Lrehues/FotovolCAT
 # End of mandatory metadata
 
 # Recommended items:
@@ -25,7 +25,7 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=python, photovoltaics, automation, Catalonia
 
-homepage=http://homepage
+homepage=https://github.com/Lrehues/FotovolCAT
 category=Plugins
 icon=icon.png
 # experimental flag
