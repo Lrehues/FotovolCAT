@@ -236,7 +236,7 @@ class FotovolCat:
             uri4 = "crs=EPSG:25831&dpiMode=7&format=image/png&layers=MP20P5M_PA&styles&url=https://geoserveis.icgc.cat/icgc_mp20p5m/wms/service"
             pendiente = QgsRasterLayer(uri4, "Pendiente > 20%", "wms")
 
-            uri5 = "crs=EPSG:25831&dpiMode=7&format=image/png&layers=orto&styles&url=https://geoserveis.icgc.cat/icc_mapesmultibase/utm/wms/service"
+            uri5 = "crs=EPSG:25831&dpiMode=7&format=image/png&layers=orto25m&styles&url=https://geoserveis.icgc.cat/icc_mapesbase/wms/service"
             orto = QgsRasterLayer(uri5, "Ortofotomapa", "wms")
 
             rlayers = [orto, sombras, agro, hidro, pendiente]
@@ -257,7 +257,7 @@ class FotovolCat:
             uri10 = "https://sig.gencat.cat/ows/PAISATGE/wfs?srsname=EPSG:25831&typename=PAISATGE:PAISATGE_UNITATS&version=1.1.0&request=GetFeature&service=WFS"
             paisaje = QgsVectorLayer(uri10, "Unidades de paisaje", "wfs")
 
-            uri11 = "https://wms.qgiscloud.com/lluc21rg/Qgs_cloud_patrimoni?srsname=EPSG:25831&typename=PATRIMONI_JACIMENT_02_bona&version=1.1.0&request=GetFeature&service=WFSo"
+            uri11 = "pagingEnabled='true' preferCoordinatesForWfsT11='false' restrictToRequestBBOX='1' srsname='EPSG:25831' typename='PATRIMONI_CULTURAL:PATRIMONI_JACIMENT_02' url='http://sig.gencat.cat/ows/PATRIMONI_CULTURAL/wfs' version='auto'"
             patrimonio = QgsVectorLayer(uri11, "Patrimonio", "wfs")
 
             layers = [carreteras, tren, rn2000, plan_ter, paisaje, patrimonio]
@@ -397,7 +397,7 @@ class FotovolCat:
             vlayers[7].triggerRepaint()
 
             # Añadimos mapa base
-            uri_topo = "crs=EPSG:25831&dpiMode=7&format=image/png&layers=topo&styles&url=https://geoserveis.icgc.cat/icc_mapesmultibase/utm/wms/service"
+            uri_topo = "crs=EPSG:25831&dpiMode=7&format=image/png&layers=mtc50m&styles&url=https://geoserveis.icgc.cat/icc_mapesbase/wms/service"
             base_topo = QgsRasterLayer(uri_topo, "Base Topografica", "wms")
             base_topo.setExtent(QgsRectangle(area_estudio.extent()))
             QgsProject.instance().addMapLayer(base_topo)
@@ -419,8 +419,12 @@ class FotovolCat:
             pfv.triggerRepaint()
             QgsProject.instance().addMapLayer(pfv)
 
-            def createLayout(layoutName, layer1, layer2=None, layer3=None, layer4=None, legendMode=True):
+            def createLayout(layoutName, layer1, layer2 = None, layer3 = None, layer4 = None, legendMode = True, topoMode = True):
                 selected_layers = [layer1, layer2, layer3, layer4]
+                if topoMode == False:
+                    QgsProject.instance().layerTreeRoot().findLayer(base_topo).setItemVisibilityChecked(False)
+                else:
+                    pass
                 for s in range(0, len(selected_layers)):
                     if selected_layers[s] != None:
                         QgsProject.instance().layerTreeRoot().findLayer(selected_layers[s]).setItemVisibilityChecked(
@@ -458,14 +462,14 @@ class FotovolCat:
                 layout.addLayoutItem(map)
 
                 # movemos y cambiamos medida mapa
-                map.attemptMove(QgsLayoutPoint(24.5, 7.7, QgsUnitTypes.LayoutMillimeters))
+                map.attemptMove(QgsLayoutPoint(25, 8, QgsUnitTypes.LayoutMillimeters))
                 map.attemptResize(QgsLayoutSize(248, 178, QgsUnitTypes.LayoutMillimeters))
 
                 # Añadimos marco info
                 polygon = QPolygonF()
                 polygon.append(QPointF(25, 186))
-                polygon.append(QPointF(272.5, 186))
-                polygon.append(QPointF(272.5, 202))
+                polygon.append(QPointF(273, 186))
+                polygon.append(QPointF(273, 202))
                 polygon.append(QPointF(25, 202))
                 polygonItem = QgsLayoutItemPolygon(polygon, layout)
                 layout.addLayoutItem(polygonItem)
@@ -514,6 +518,15 @@ class FotovolCat:
                 layout.addLayoutItem(header)
                 header.attemptMove(QgsLayoutPoint(90, 191.5, QgsUnitTypes.LayoutMillimeters))
 
+                #Añadimos etiqueta fotovolCAT
+                etiqueta = QgsLayoutItemLabel(layout)
+                etiqueta.setText("Creado con FotovolCAT")
+                etiqueta.setFont(QFont("Arial", 8))
+                etiqueta.setFixedSize(QgsLayoutSize(70, 12, QgsUnitTypes.LayoutMillimeters))
+                etiqueta.adjustSizeToText()
+                layout.addLayoutItem(etiqueta)
+                etiqueta.attemptMove(QgsLayoutPoint(245, 203.5, QgsUnitTypes.LayoutMillimeters))
+
                 # Añadimos flecha norte
                 north = QgsLayoutItemPicture(layout)
                 north.setMode(QgsLayoutItemPicture.FormatSVG)
@@ -524,7 +537,14 @@ class FotovolCat:
 
                 directory = self.dlg.leOutput.text()
                 exporter = QgsLayoutExporter(layout)
-                exporter.exportToPdf(f"{directory}/{layoutName}.pdf", QgsLayoutExporter.PdfExportSettings())
+                expSettings = exporter.PdfExportSettings()
+                expSettings.dpi = 300
+                exporter.exportToPdf(f"{directory}/{layoutName}.pdf", expSettings)
+
+                if topoMode == False:
+                    QgsProject.instance().layerTreeRoot().findLayer(base_topo).setItemVisibilityChecked(True)
+                else:
+                    pass
 
                 # Al acabar layout volvemos a desactivar todas las capas
                 for s in range(0, len(selected_layers)):
@@ -535,7 +555,7 @@ class FotovolCat:
             #Exportamos mapas si la casilla está marcada
             if self.dlg.cbExport.isChecked():
                 # Orto:
-                createLayout("Mapa ortofotográfico", rlayers[0], legendMode=False)
+                createLayout("Mapa ortofotográfico", rlayers[0], legendMode=False, topoMode=False)
 
                 # Agro:
                 createLayout("Capacidad agrológica", rlayers[2], legendMode=False)
@@ -562,7 +582,7 @@ class FotovolCat:
                 createLayout("Mapa topográfico", base_topo, legendMode=False)
 
                 # Pendiente:
-                createLayout("Pendiente", rlayers[1], rlayers[4])
+                createLayout("Pendiente", rlayers[1], rlayers[4], topoMode=False)
 
             else:
                 pass
