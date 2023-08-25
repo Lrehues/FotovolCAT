@@ -239,26 +239,29 @@ class FotovolCat:
             uri5 = "crs=EPSG:25831&dpiMode=7&format=image/png&layers=orto25m&styles&url=https://geoserveis.icgc.cat/icc_mapesbase/wms/service"
             orto = QgsRasterLayer(uri5, "Ortofotomapa", "wms")
 
-            rlayers = [orto, sombras, agro, hidro, pendiente]
+            uri6 = "crs=EPSG:25831&dpiMode=7&format=image/jpeg&layers=mtc50msg&styles&url=https://geoserveis.icgc.cat/icc_fonstopografic/wms/service"
+            topo_gris = QgsRasterLayer(uri6, "Topográfico gris", "wms")
+
+            rlayers = [topo_gris, orto, sombras, agro, hidro, pendiente]
 
             # cargamos wfs
-            uri6 = "https://sig.gencat.cat/ows/XARXES_TRANSPORT/wfs?srsname=EPSG:25831&typename=XARXES_TRANSPORT:XT_GRAF_CATALEG_CARRETERES&version=1.1.0&request=GetFeature&service=WFS"
-            carreteras = QgsVectorLayer(uri6, "Carreteras", "wfs")
+            uri7 = "https://sig.gencat.cat/ows/XARXES_TRANSPORT/wfs?srsname=EPSG:25831&typename=XARXES_TRANSPORT:XT_GRAF_CATALEG_CARRETERES&version=1.1.0&request=GetFeature&service=WFS"
+            carreteras = QgsVectorLayer(uri7, "Carreteras", "wfs")
 
-            uri7 = "https://sig.gencat.cat/ows/XARXES_TRANSPORT/wfs?srsname=EPSG:25831&typename=XARXES_TRANSPORT:XT_GRAF_CATALEG_FERRO&version=1.1.0&request=GetFeature&service=WFS"
-            tren = QgsVectorLayer(uri7, "Ferrocarril", "wfs")
+            uri8 = "https://sig.gencat.cat/ows/XARXES_TRANSPORT/wfs?srsname=EPSG:25831&typename=XARXES_TRANSPORT:XT_GRAF_CATALEG_FERRO&version=1.1.0&request=GetFeature&service=WFS"
+            tren = QgsVectorLayer(uri8, "Ferrocarril", "wfs")
 
-            uri8 = "https://sig.gencat.cat/ows/ESPAIS_NATURALS/wfs?srsname=EPSG:25831&typename=ESPAIS_NATURALS:ESPAISNATURALS_XARNAT_2000&version=1.1.0&request=GetFeature&service=WFS"
-            rn2000 = QgsVectorLayer(uri8, "Red Natura 2000", "wfs")
+            uri9 = "https://sig.gencat.cat/ows/ESPAIS_NATURALS/wfs?srsname=EPSG:25831&typename=ESPAIS_NATURALS:ESPAISNATURALS_XARNAT_2000&version=1.1.0&request=GetFeature&service=WFS"
+            rn2000 = QgsVectorLayer(uri9, "Red Natura 2000", "wfs")
 
-            uri9 = "https://sig.gencat.cat/ows/PLANEJAMENT/wfs?srsname=EPSG:25831&typename=PLANEJAMENT:PLANSTP_ESPAIS_OBERTS&version=1.1.0&request=GetFeature&service=WFS"
-            plan_ter = QgsVectorLayer(uri9, "Planeamiento territorial", "wfs")
+            uri10 = "https://sig.gencat.cat/ows/PLANEJAMENT/wfs?srsname=EPSG:25831&typename=PLANEJAMENT:PLANSTP_ESPAIS_OBERTS&version=1.1.0&request=GetFeature&service=WFS"
+            plan_ter = QgsVectorLayer(uri10, "Planeamiento territorial", "wfs")
 
-            uri10 = "https://sig.gencat.cat/ows/PAISATGE/wfs?srsname=EPSG:25831&typename=PAISATGE:PAISATGE_UNITATS&version=1.1.0&request=GetFeature&service=WFS"
-            paisaje = QgsVectorLayer(uri10, "Unidades de paisaje", "wfs")
+            uri11 = "https://sig.gencat.cat/ows/PAISATGE/wfs?srsname=EPSG:25831&typename=PAISATGE:PAISATGE_UNITATS&version=1.1.0&request=GetFeature&service=WFS"
+            paisaje = QgsVectorLayer(uri11, "Unidades de paisaje", "wfs")
 
-            uri11 = "pagingEnabled='true' preferCoordinatesForWfsT11='false' restrictToRequestBBOX='1' srsname='EPSG:25831' typename='PATRIMONI_CULTURAL:PATRIMONI_JACIMENT_02' url='http://sig.gencat.cat/ows/PATRIMONI_CULTURAL/wfs' version='auto'"
-            patrimonio = QgsVectorLayer(uri11, "Patrimonio", "wfs")
+            uri12 = "pagingEnabled='true' preferCoordinatesForWfsT11='false' restrictToRequestBBOX='1' srsname='EPSG:25831' typename='PATRIMONI_CULTURAL:PATRIMONI_JACIMENT_02' url='http://sig.gencat.cat/ows/PATRIMONI_CULTURAL/wfs' version='auto'"
+            patrimonio = QgsVectorLayer(uri12, "Patrimonio", "wfs")
 
             layers = [carreteras, tren, rn2000, plan_ter, paisaje, patrimonio]
 
@@ -555,13 +558,13 @@ class FotovolCat:
             #Exportamos mapas si la casilla está marcada
             if self.dlg.cbExport.isChecked():
                 # Orto:
-                createLayout("Mapa ortofotográfico", rlayers[0], legendMode=False, topoMode=False)
+                createLayout("Mapa ortofotográfico", rlayers[1], legendMode=False, topoMode=False)
 
                 # Agro:
-                createLayout("Capacidad agrológica", rlayers[2], legendMode=False)
+                createLayout("Capacidad agrológica", rlayers[3], legendMode=False)
 
                 # Hidro:
-                createLayout("Red hidrográfica", rlayers[3], legendMode=False)
+                createLayout("Red hidrográfica", rlayers[4], rlayers[0], legendMode=False, topoMode=False)
 
                 # Infraestructuras:
                 createLayout("Infraestructuras", vlayers[0], vlayers[1], vlayers[3], vlayers[4])
@@ -582,7 +585,7 @@ class FotovolCat:
                 createLayout("Mapa topográfico", base_topo, legendMode=False)
 
                 # Pendiente:
-                createLayout("Pendiente", rlayers[1], rlayers[4], topoMode=False)
+                createLayout("Pendiente", rlayers[2], rlayers[5], topoMode=False)
 
             else:
                 pass
