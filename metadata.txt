@@ -6,7 +6,7 @@
 name=FotovolCAT
 qgisMinimumVersion=3.0
 description=Spatial analysis automation for solar power station sitting in Catalonia
-version=0.1
+version=0.2
 author=Lluc Rehues
 email=fotovolcat@gmail.com
 
