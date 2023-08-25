@@ -541,7 +541,7 @@ class FotovolCat:
                 directory = self.dlg.leOutput.text()
                 exporter = QgsLayoutExporter(layout)
                 expSettings = exporter.PdfExportSettings()
-                expSettings.dpi = 300
+                expSettings.dpi = 150
                 exporter.exportToPdf(f"{directory}/{layoutName}.pdf", expSettings)
 
                 if topoMode == False:
